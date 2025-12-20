@@ -1,5 +1,6 @@
 export interface TeamStats {
-  team: string;
+  id: number;
+  teamName: string;
   matches: number;
   wins: number;
   losses: number;
@@ -16,7 +17,8 @@ export interface TeamStats {
 
 export const pointsTable: TeamStats[] = [
   {
-    team: "Chennai Super Kings",
+    id: 1,
+    teamName: "Chennai Super Kings",
     matches: 7,
     wins: 5,
     losses: 2,
@@ -28,7 +30,8 @@ export const pointsTable: TeamStats[] = [
     nrr: 0.771,
   },
   {
-    team: "Royal Challengers Bangalore",
+    id: 2,
+    teamName: "Royal Challengers Bangalore",
     matches: 7,
     wins: 4,
     losses: 3,
@@ -40,7 +43,8 @@ export const pointsTable: TeamStats[] = [
     nrr: 0.597,
   },
   {
-    team: "Delhi Capitals",
+    id: 3,
+    teamName: "Delhi Capitals",
     matches: 7,
     wins: 4,
     losses: 3,
@@ -52,7 +56,8 @@ export const pointsTable: TeamStats[] = [
     nrr: 0.319,
   },
   {
-    team: "Rajasthan Royals",
+    id: 4,
+    teamName: "Rajasthan Royals",
     matches: 7,
     wins: 3,
     losses: 4,
@@ -64,7 +69,8 @@ export const pointsTable: TeamStats[] = [
     nrr: 0.331,
   },
   {
-    team: "Mumbai Indians",
+    id: 5,
+    teamName: "Mumbai Indians",
     matches: 8,
     wins: 2,
     losses: 6,
