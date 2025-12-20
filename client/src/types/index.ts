@@ -36,7 +36,7 @@ export interface Team {
   losses: number
   nrr: number
   runsFor: number
-  oversFor: number
+  oversFaced: number
   runsAgainst: number
   oversBowled: number
   points: number
