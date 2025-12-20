@@ -103,8 +103,7 @@ All critical backend logic is covered using Jest unit and integration tests.
 ```bash
 npm test
 ```
-<img width="1029" height="402" alt="image" src="https://github.com/user-attachments/assets/7a190218-6994-423a-b569-ef898fdbb322" />
-
+<img width="1079" height="356" alt="image" src="https://github.com/user-attachments/assets/3a10cac6-54e7-4dfe-aa20-6039fcba2c5a" />
 
 ## Test Coverage Includes
 1. Overs to decimal conversion (unit tests)

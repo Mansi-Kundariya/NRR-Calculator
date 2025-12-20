@@ -39,8 +39,13 @@ export function calculateChasingRange({
     .filter((t) => t.id !== teamId)
     .sort((a, b) => b.nrr - a.nrr);
 
-  const upperNRR = sorted[desiredPosition - 2]?.nrr ?? Infinity;
-  const lowerNRR = sorted[desiredPosition - 1]?.nrr ?? -Infinity;
+  const upperNRR =
+    desiredPosition === 1 ? Infinity : sorted[desiredPosition - 2]?.nrr;
+
+  const lowerNRR =
+    desiredPosition === pointsTable.length
+      ? -Infinity
+      : sorted[desiredPosition - 1]?.nrr;
 
   const nrrAt = (overs: number) =>
     calculateNRR({
@@ -50,44 +55,70 @@ export function calculateChasingRange({
       oversBowled: newOversBowled,
     });
 
-  // Binary search for find minimum R (NRR just below upperNRR)
+  let minOvers = 0.1;
+  let maxOvers = matchOversDecimal;
+
+  // Case 1: Desired position = 1 (only minimum constraint)
+  if (desiredPosition === 1) {
+    let low = 0.1,
+      high = matchOversDecimal;
+    let result = null;
+
+    while (high - low > 0.01) {
+      const mid = (low + high) / 2;
+      if (nrrAt(mid) >= sorted[0].nrr) {
+        result = mid;
+        high = mid;
+      } else {
+        low = mid;
+      }
+    }
+
+    if (!result) return null;
+
+    return {
+      minOvers: +result.toFixed(1),
+      maxOvers: +matchOversDecimal.toFixed(1),
+      minNRR: +nrrAt(matchOversDecimal).toFixed(3),
+      maxNRR: +nrrAt(result).toFixed(3),
+    };
+  }
+
+  // Case 2: Middle positions (both bounds)
   let low = 0.1,
     high = matchOversDecimal;
-  let minOvers = null;
+  let min = null,
+    max = null;
 
   while (high - low > 0.01) {
-    const mid = Number(((low + high) / 2).toFixed(3));
+    const mid = (low + high) / 2;
     if (nrrAt(mid) < upperNRR) {
-      minOvers = mid;
+      min = mid;
       high = mid;
     } else {
       low = mid;
     }
   }
 
-  // Binary search for find maximum R (NRR just above lowerNRR)
   low = 0.1;
   high = matchOversDecimal;
-  let maxOvers = null;
 
   while (high - low > 0.01) {
     const mid = (low + high) / 2;
     if (nrrAt(mid) > lowerNRR) {
-      maxOvers = mid;
+      max = mid;
       low = mid;
     } else {
       high = mid;
     }
   }
 
-  if (!minOvers || !maxOvers || minOvers > maxOvers) {
-    return null;
-  }
+  if (!min || !max || min > max) return null;
 
   return {
-    minOvers: +minOvers.toFixed(1),
-    maxOvers: +maxOvers.toFixed(1),
-    minNRR: +nrrAt(maxOvers).toFixed(3),
-    maxNRR: +nrrAt(minOvers).toFixed(3),
+    minOvers: +min.toFixed(1),
+    maxOvers: +max.toFixed(1),
+    minNRR: +nrrAt(max).toFixed(3),
+    maxNRR: +nrrAt(min).toFixed(3),
   };
 }
