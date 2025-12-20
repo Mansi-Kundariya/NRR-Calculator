@@ -17,101 +17,49 @@ export function calculateBattingFirstRange({
   matchOvers,
   desiredPosition,
 }: BattingFirstInput) {
-  const team = pointsTable.find((t) => t.id === teamId);
-  const opponent = pointsTable.find((t) => t.id === opponentId);
-
+  const team = pointsTable.find(t => t.id === teamId);
+  const opponent = pointsTable.find(t => t.id === opponentId);
   if (!team || !opponent) return null;
 
-  // Convert overs to decimal
   const teamOversFaced = oversToDecimal(team.oversFaced);
   const teamOversBowled = oversToDecimal(team.oversBowled);
   const matchOversDecimal = oversToDecimal(matchOvers);
 
-  // Updated team stats after batting first
   const newRunsFor = team.runsFor + teamRuns;
   const newOversFaced = teamOversFaced + matchOversDecimal;
   const newOversBowled = teamOversBowled + matchOversDecimal;
 
-  /**
-   * Determine the NRR range required to reach the desired table position.
-   * Team must end up:
-   *  - Below the team above the target position
-   *  - Above the team below the target position
-   */
-  const sortedTeams = [...pointsTable]
-    .filter((t) => t.id !== teamId)
+  // Sort table EXCLUDING current team
+  const others = [...pointsTable]
+    .filter(t => t.id !== teamId)
     .sort((a, b) => b.nrr - a.nrr);
 
-  const upperNRR = sortedTeams[desiredPosition - 2]?.nrr ?? Infinity;
-  const lowerNRR = sortedTeams[desiredPosition - 1]?.nrr ?? -Infinity;
+  // Correct boundary handling
+  const upperNRR =
+    desiredPosition > 1 ? others[desiredPosition - 2].nrr : Infinity;
 
-  const nrrAt = (r: number) =>
+  const lowerNRR =
+    desiredPosition <= others.length
+      ? others[desiredPosition - 1].nrr
+      : -Infinity;
+
+  const nrrAt = (oppRuns: number) =>
     calculateNRR({
       runsFor: newRunsFor,
       oversFaced: newOversFaced,
-      runsAgainst: team.runsAgainst + r,
+      runsAgainst: team.runsAgainst + oppRuns,
       oversBowled: newOversBowled,
     });
 
-  // Binary search for find minimum R (NRR just below upperNRR)
-  let low = 0,
-    high = teamRuns;
-  let minRuns = null;
+  let minRuns: number | null = null;
+  let maxRuns: number | null = null;
 
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    if (nrrAt(mid) < upperNRR) {
-      minRuns = mid;
-      high = mid - 1;
-    } else {
-      low = mid + 1;
-    }
-  }
-
-  // Binary search for find maximum R (NRR just above lowerNRR)
-  low = 0;
-  high = teamRuns;
-  let maxRuns = null;
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    if (nrrAt(mid) > lowerNRR) {
-      maxRuns = mid;
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  if (minRuns === null || maxRuns === null || minRuns > maxRuns) {
-    return null;
-  }
-
-  return {
-    minRuns,
-    maxRuns,
-    minNRR: +nrrAt(maxRuns).toFixed(3),
-    maxNRR: +nrrAt(minRuns).toFixed(3),
-  };
-
-  /*
-  Brute-force : alternative way to calculate NRR range
-  
-  for (let opponentRuns = 0; opponentRuns <= teamRuns; opponentRuns++) {
-    const newRunsAgainst = team.runsAgainst + opponentRuns;
-
-    const nrr = calculateNRR({
-      runsFor: newRunsFor,
-      oversFaced: newOversFaced,
-      runsAgainst: newRunsAgainst,
-      oversBowled: newOversBowled,
-    });
-
+  // SAFE brute-force (teamRuns ≤ 200, very small)
+  for (let r = 0; r < teamRuns; r++) {
+    const nrr = nrrAt(r);
     if (nrr > lowerNRR && nrr < upperNRR) {
-      minRuns = minRuns === null ? opponentRuns : minRuns;
-      maxRuns = opponentRuns;
-      minNRR = Math.min(minNRR, nrr);
-      maxNRR = Math.max(maxNRR, nrr);
+      if (minRuns === null) minRuns = r;
+      maxRuns = r;
     }
   }
 
@@ -120,8 +68,8 @@ export function calculateBattingFirstRange({
   return {
     minRuns,
     maxRuns,
-    minNRR: +minNRR.toFixed(3),
-    maxNRR: +maxNRR.toFixed(3),
+    minNRR: +nrrAt(maxRuns).toFixed(3),
+    maxNRR: +nrrAt(minRuns).toFixed(3),
   };
-  */
 }
+
