@@ -4,12 +4,12 @@ import { calculateChasingRange } from "../services/rangeChasing.service";
 
 export const calculateNRRController = (req: Request, res: Response) => {
   try {
-    const { teamName, opponentName, matchOvers, desiredPosition, toss, runs } =
+    const { teamId, opponentId, matchOvers, desiredPosition, toss, runs } =
       req.body;
 
     if (
-      !teamName ||
-      !opponentName ||
+      !teamId ||
+      !opponentId ||
       !matchOvers ||
       !desiredPosition ||
       !toss ||
@@ -25,16 +25,16 @@ export const calculateNRRController = (req: Request, res: Response) => {
 
     if (toss === "BATTING_FIRST") {
       result = calculateBattingFirstRange({
-        teamName,
-        opponentName,
+        teamId,
+        opponentId,
         teamRuns: runs,
         matchOvers,
         desiredPosition,
       });
     } else if (toss === "BOWLING_FIRST") {
       result = calculateChasingRange({
-        teamName,
-        opponentName,
+        teamId,
+        opponentId,
         targetRuns: runs,
         matchOvers,
         desiredPosition,

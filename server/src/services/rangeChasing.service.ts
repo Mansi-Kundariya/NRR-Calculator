@@ -3,20 +3,20 @@ import { calculateNRR } from "../utils/nrr.util";
 import { oversToDecimal } from "../utils/oversToDecimal.util";
 
 interface ChasingInput {
-  teamName: string;
-  opponentName: string;
+  teamId: number;
+  opponentId: number;
   targetRuns: number;
   matchOvers: number;
   desiredPosition: number;
 }
 
 export function calculateChasingRange({
-  teamName,
+  teamId,
   targetRuns,
   matchOvers,
   desiredPosition,
 }: ChasingInput) {
-  const team = pointsTable.find((t) => t.team === teamName);
+  const team = pointsTable.find((t) => t.id === teamId);
   if (!team) return null;
 
   const matchOversDecimal = oversToDecimal(matchOvers);
@@ -36,13 +36,12 @@ export function calculateChasingRange({
    *  - Above the team below the target position
    */
   const sorted = [...pointsTable]
-    .filter((t) => t.team !== teamName)
+    .filter((t) => t.id !== teamId)
     .sort((a, b) => b.nrr - a.nrr);
 
   const upperNRR = sorted[desiredPosition - 2]?.nrr ?? Infinity;
   const lowerNRR = sorted[desiredPosition - 1]?.nrr ?? -Infinity;
 
-  
   const nrrAt = (overs: number) =>
     calculateNRR({
       runsFor: newRunsFor,

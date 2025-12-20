@@ -3,22 +3,22 @@ import { calculateNRR } from "../utils/nrr.util";
 import { oversToDecimal } from "../utils/oversToDecimal.util";
 
 interface BattingFirstInput {
-  teamName: string;
-  opponentName: string;
+  teamId: number;
+  opponentId: number;
   teamRuns: number;
   matchOvers: number;
   desiredPosition: number;
 }
 
 export function calculateBattingFirstRange({
-  teamName,
-  opponentName,
+  teamId,
+  opponentId,
   teamRuns,
   matchOvers,
   desiredPosition,
 }: BattingFirstInput) {
-  const team = pointsTable.find((t) => t.team === teamName);
-  const opponent = pointsTable.find((t) => t.team === opponentName);
+  const team = pointsTable.find((t) => t.id === teamId);
+  const opponent = pointsTable.find((t) => t.id === opponentId);
 
   if (!team || !opponent) return null;
 
@@ -39,7 +39,7 @@ export function calculateBattingFirstRange({
    *  - Above the team below the target position
    */
   const sortedTeams = [...pointsTable]
-    .filter((t) => t.team !== teamName)
+    .filter((t) => t.id !== teamId)
     .sort((a, b) => b.nrr - a.nrr);
 
   const upperNRR = sortedTeams[desiredPosition - 2]?.nrr ?? Infinity;
