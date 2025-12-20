@@ -1,10 +1,11 @@
+// Integration tests for calculateBattingFirstRange service
 import { calculateBattingFirstRange } from "../services/rangeBattingFirst.service";
 
 describe("calculateBattingFirstRange", () => {
   it("returns valid run restriction range", () => {
     const result = calculateBattingFirstRange({
-      teamName: "Rajasthan Royals",
-      opponentName: "Delhi Capitals",
+      teamId: 4,
+      opponentId: 3,
       teamRuns: 120,
       matchOvers: 20,
       desiredPosition: 3,
@@ -16,8 +17,8 @@ describe("calculateBattingFirstRange", () => {
 
   it("returns null when no valid range exists", () => {
     const result = calculateBattingFirstRange({
-      teamName: "Rajasthan Royals",
-      opponentName: "Delhi Capitals",
+      teamId: 4,
+      opponentId: 3,
       teamRuns: 10,
       matchOvers: 20,
       desiredPosition: 1,

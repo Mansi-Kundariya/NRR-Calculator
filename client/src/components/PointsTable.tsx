@@ -50,7 +50,7 @@ export function PointsTable({ teams }: PointsTableProps) {
                 </span>
               </td>
               <td className="text-center p-3 text-sm text-gray-600">
-                {team.runsFor}/{team.oversFor}
+                {team.runsFor}/{team.oversFaced}
               </td>
               <td className="text-center p-3 text-sm text-gray-600">
                 {team.runsAgainst}/{team.oversBowled}

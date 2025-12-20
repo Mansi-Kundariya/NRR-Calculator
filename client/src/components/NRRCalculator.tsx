@@ -12,6 +12,7 @@ import { ResultsDisplay } from "./ResultsDisplay";
 import { MatchInputForm } from "./MatchInputForm";
 import { getPointTable } from "../api/getData";
 import { calculateNRR } from "../api/nrrApi";
+import { toast } from "react-toastify";
 
 export function NRRCalculator() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -28,19 +29,27 @@ export function NRRCalculator() {
       runs: scenario.runs,
     };
 
-    await calculateNRR(data).then((response) => {
-      const resData: CalculationResult = {
-        ...response.data,
-        teamName: teams.find((t) => t.id === scenario.yourTeam)?.teamName || "",
-        opponentName:
-          teams.find((t) => t.id === scenario.oppositionTeam)?.teamName || "",
-        matchOvers: scenario.matchOvers,
-        desiredPosition: scenario.desiredPosition,
-        runs: scenario.runs,
-        tossResult: scenario.tossResult,
-      };
-      setResult(resData);
-    });
+    await calculateNRR(data)
+      .then((response) => {
+        console.log(response);
+        const resData: CalculationResult = {
+          ...response.data,
+          teamName:
+            teams.find((t) => t.id === scenario.yourTeam)?.teamName || "",
+          opponentName:
+            teams.find((t) => t.id === scenario.oppositionTeam)?.teamName || "",
+          matchOvers: scenario.matchOvers,
+          desiredPosition: scenario.desiredPosition,
+          runs: scenario.runs,
+          tossResult: scenario.tossResult,
+        };
+        setResult(resData);
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message || "Something went wrong!");
+        setResult(null);
+        console.error("Error calculating NRR:", error);
+      });
   };
 
   useEffect(() => {
