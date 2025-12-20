@@ -1,4 +1,4 @@
-# 🏏 NRR-Calculator
+# <img width="25" height="25" alt="logo" src="https://github.com/user-attachments/assets/c875656b-186a-478b-9939-cc5040240b31" /> NRR-Calculator
 
 NRR Calculator and Match Simulation tool for IPL-style Points Table.  
 Built as part of the **CricHeroes – Full Stack Developer Practical Assignment**.
@@ -127,19 +127,33 @@ Start frontend
 ```bash
 npm run dev
 ```
+<img width="1896" height="703" alt="image" src="https://github.com/user-attachments/assets/c0446b03-e400-47ec-b8c6-2faab64ee7b1" />
+<img width="1893" height="699" alt="image" src="https://github.com/user-attachments/assets/49d7bc51-8925-41a2-be67-66145ecde86b" />
+<img width="1871" height="534" alt="image" src="https://github.com/user-attachments/assets/5ca503d6-1ddd-47bc-8557-640099d91eaa" />
 
---
 
 ### 📊 Sample Output
 ## Bowling First Case
 ```pgsql
 If Rajasthan Royals score 120 runs in 20 overs,
-they need to restrict Delhi Capitals between 0 to 112 runs.
-Revised NRR will be between 0.319 to 0.39.
+they need to restrict Delhi Capitals between 69 to 112 runs.
+Revised NRR will be between 0.322 to 0.596.
 ```
 ## Batting Second Case
 ```pgsql
-Rajasthan Royals need to chase 119 runs between 17.3 to 19.4 overs.
-Revised NRR will be between 0.32 to 0.45.
+Rajasthan Royals need to chase 119 runs between 14.2 to 19.1 overs.
+Revised NRR will be between 0.320 to 0.596.
 ```
+---
+
+### 🏁 Conclusion
+This project demonstrates:
+ - Strong algorithmic problem-solving
+ - Correct Net Run Rate calculations
+ - Clean backend architecture
+ - Proper unit and integration testing practices
+
+## 👩‍💻 Developed By
+**Mansi Patel**
+Full Stack Developer
 
