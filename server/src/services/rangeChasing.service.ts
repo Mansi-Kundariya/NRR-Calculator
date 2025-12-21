@@ -1,4 +1,5 @@
 import { pointsTable } from "../data/pointsTable";
+import { getTeamPosition } from "../utils/getTeamPosition.util";
 import { calculateNRR } from "../utils/nrr.util";
 import { oversToDecimal } from "../utils/oversToDecimal.util";
 
@@ -12,113 +13,111 @@ interface ChasingInput {
 
 export function calculateChasingRange({
   teamId,
+  opponentId,
   targetRuns,
   matchOvers,
   desiredPosition,
 }: ChasingInput) {
   const team = pointsTable.find((t) => t.id === teamId);
-  if (!team) return null;
+  const opponent = pointsTable.find((t) => t.id === opponentId);
+  if (!team || !opponent) return null;
 
-  const matchOversDecimal = oversToDecimal(matchOvers);
+  const matchBalls = matchOvers * 6;
+  const maxChaseBalls = matchBalls - 1; // must win before last ball
 
-  // Existing team stats before the chase
-  const oldOversFaced = oversToDecimal(team.oversFaced);
-  const newOversBowled = oversToDecimal(team.oversBowled) + matchOversDecimal;
+  let low = 1; // minimum 1 ball
+  let high = maxChaseBalls;
 
-  // After a successful chase, runs scored
-  const newRunsFor = team.runsFor + targetRuns;
-  const newRunsAgainst = team.runsAgainst + targetRuns;
+  let minBalls: number | null = null;
+  let maxBalls: number | null = null;
 
-  /**
-   * Determine the NRR range required to reach the desired table position.
-   * Team must end up:
-   *  - Below the team above the target position
-   *  - Above the team below the target position
-   */
-  const sorted = [...pointsTable]
-    .filter((t) => t.id !== teamId)
-    .sort((a, b) => b.nrr - a.nrr);
+  function oversToBalls(overs: number): number {
+    const wholeOvers = Math.floor(overs);
+    const balls = Math.round((overs - wholeOvers) * 10);
+    return wholeOvers * 6 + balls;
+  }
 
-  const upperNRR =
-    desiredPosition === 1 ? Infinity : sorted[desiredPosition - 2]?.nrr;
+  function ballsToOvers(balls: number): number {
+    const overs = Math.floor(balls / 6);
+    const remBalls = balls % 6;
+    return Number(`${overs}.${remBalls}`);
+  }
 
-  const lowerNRR =
-    desiredPosition === pointsTable.length
-      ? -Infinity
-      : sorted[desiredPosition - 1]?.nrr;
+  const simulate = (balls: number) => {
+    if (balls >= matchBalls) return null;
 
-  const nrrAt = (overs: number) =>
-    calculateNRR({
-      runsFor: newRunsFor,
-      oversFaced: oldOversFaced + overs,
-      runsAgainst: newRunsAgainst,
-      oversBowled: newOversBowled,
+    const overs = balls / 6;
+
+    const updatedTeam = {
+      ...team,
+      runsFor: team.runsFor + targetRuns,
+      oversFaced: oversToDecimal(team.oversFaced) + overs,
+      runsAgainst: team.runsAgainst + targetRuns,
+      oversBowled: oversToDecimal(team.oversBowled) + matchOvers,
+      points: team.points + 2,
+    };
+
+    const updatedOpponent = {
+      ...opponent,
+      runsFor: opponent.runsFor + targetRuns,
+      oversFaced: oversToDecimal(opponent.oversFaced) + matchOvers,
+      runsAgainst: opponent.runsAgainst + targetRuns,
+      oversBowled: oversToDecimal(opponent.oversBowled) + overs,
+      points: opponent.points,
+    };
+
+    updatedTeam.nrr = calculateNRR(updatedTeam);
+    updatedOpponent.nrr = calculateNRR(updatedOpponent);
+
+    const updatedTable = pointsTable.map((t) => {
+      if (t.id === teamId) return updatedTeam;
+      if (t.id === opponentId) return updatedOpponent;
+      return t;
     });
 
-  let minOvers = 0.1;
-  let maxOvers = matchOversDecimal;
-
-  // Case 1: Desired position = 1 (only minimum constraint)
-  if (desiredPosition === 1) {
-    let low = 0.1,
-      high = matchOversDecimal;
-    let result = null;
-
-    while (high - low > 0.01) {
-      const mid = (low + high) / 2;
-      if (nrrAt(mid) >= sorted[0].nrr) {
-        result = mid;
-        high = mid;
-      } else {
-        low = mid;
-      }
-    }
-
-    if (!result) return null;
-
     return {
-      minOvers: +result.toFixed(1),
-      maxOvers: +matchOversDecimal.toFixed(1),
-      minNRR: +nrrAt(matchOversDecimal).toFixed(3),
-      maxNRR: +nrrAt(result).toFixed(3),
+      position: getTeamPosition(updatedTable, teamId),
+      nrr: updatedTeam.nrr,
     };
-  }
+  };
 
-  // Case 2: Middle positions (both bounds)
-  let low = 0.1,
-    high = matchOversDecimal;
-  let min = null,
-    max = null;
+  /* -------- FIND MIN BALLS -------- */
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const res = simulate(mid);
 
-  while (high - low > 0.01) {
-    const mid = (low + high) / 2;
-    if (nrrAt(mid) < upperNRR) {
-      min = mid;
-      high = mid;
+    if (res && res.position <= desiredPosition) {
+      minBalls = mid;
+      high = mid - 1;
     } else {
-      low = mid;
+      low = mid + 1;
     }
   }
 
-  low = 0.1;
-  high = matchOversDecimal;
+  if (minBalls === null) return null;
 
-  while (high - low > 0.01) {
-    const mid = (low + high) / 2;
-    if (nrrAt(mid) > lowerNRR) {
-      max = mid;
-      low = mid;
+  /* -------- FIND MAX BALLS -------- */
+  low = minBalls;
+  high = maxChaseBalls;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const res = simulate(mid);
+
+    if (res && res.position <= desiredPosition) {
+      maxBalls = mid;
+      low = mid + 1;
     } else {
-      high = mid;
+      high = mid - 1;
     }
   }
 
-  if (!min || !max || min > max) return null;
+  if (maxBalls === null) return null;
 
   return {
-    minOvers: +min.toFixed(1),
-    maxOvers: +max.toFixed(1),
-    minNRR: +nrrAt(max).toFixed(3),
-    maxNRR: +nrrAt(min).toFixed(3),
+    minOvers: ballsToOvers(minBalls),
+    maxOvers: ballsToOvers(maxBalls),
+    minNRR: +simulate(maxBalls)!.nrr.toFixed(3),
+    maxNRR: +simulate(minBalls)!.nrr.toFixed(3),
   };
 }

@@ -1,4 +1,5 @@
 import { pointsTable } from "../data/pointsTable";
+import { getTeamPosition } from "../utils/getTeamPosition.util";
 import { calculateNRR } from "../utils/nrr.util";
 import { oversToDecimal } from "../utils/oversToDecimal.util";
 
@@ -17,59 +18,90 @@ export function calculateBattingFirstRange({
   matchOvers,
   desiredPosition,
 }: BattingFirstInput) {
-  const team = pointsTable.find(t => t.id === teamId);
-  const opponent = pointsTable.find(t => t.id === opponentId);
+  const team = pointsTable.find((t) => t.id === teamId);
+  const opponent = pointsTable.find((t) => t.id === opponentId);
   if (!team || !opponent) return null;
 
-  const teamOversFaced = oversToDecimal(team.oversFaced);
-  const teamOversBowled = oversToDecimal(team.oversBowled);
-  const matchOversDecimal = oversToDecimal(matchOvers);
+  const matchOversDec = oversToDecimal(matchOvers);
 
-  const newRunsFor = team.runsFor + teamRuns;
-  const newOversFaced = teamOversFaced + matchOversDecimal;
-  const newOversBowled = teamOversBowled + matchOversDecimal;
-
-  // Sort table EXCLUDING current team
-  const others = [...pointsTable]
-    .filter(t => t.id !== teamId)
-    .sort((a, b) => b.nrr - a.nrr);
-
-  // Correct boundary handling
-  const upperNRR =
-    desiredPosition > 1 ? others[desiredPosition - 2].nrr : Infinity;
-
-  const lowerNRR =
-    desiredPosition <= others.length
-      ? others[desiredPosition - 1].nrr
-      : -Infinity;
-
-  const nrrAt = (oppRuns: number) =>
-    calculateNRR({
-      runsFor: newRunsFor,
-      oversFaced: newOversFaced,
-      runsAgainst: team.runsAgainst + oppRuns,
-      oversBowled: newOversBowled,
-    });
-
+  let low = 0;
+  let high = teamRuns;
   let minRuns: number | null = null;
   let maxRuns: number | null = null;
 
-  // SAFE brute-force (teamRuns ≤ 200, very small)
-  for (let r = 0; r < teamRuns; r++) {
-    const nrr = nrrAt(r);
-    if (nrr > lowerNRR && nrr < upperNRR) {
-      if (minRuns === null) minRuns = r;
-      maxRuns = r;
+  const simulate = (oppRuns: number) => {
+    const teamWin = teamRuns > oppRuns;
+
+    const updatedTeam = {
+      ...team,
+      runsFor: team.runsFor + teamRuns,
+      oversFaced: oversToDecimal(team.oversFaced) + matchOversDec,
+      runsAgainst: team.runsAgainst + oppRuns,
+      oversBowled: oversToDecimal(team.oversBowled) + matchOversDec,
+      points: team.points + (teamWin ? 2 : 0),
+    };
+
+    const updatedOpponent = {
+      ...opponent,
+      runsFor: opponent.runsFor + oppRuns,
+      oversFaced: oversToDecimal(opponent.oversFaced) + matchOversDec,
+      runsAgainst: opponent.runsAgainst + teamRuns,
+      oversBowled: oversToDecimal(opponent.oversBowled) + matchOversDec,
+      points: opponent.points + (!teamWin ? 2 : 0),
+    };
+
+    updatedTeam.nrr = calculateNRR(updatedTeam);
+    updatedOpponent.nrr = calculateNRR(updatedOpponent);
+
+    const updatedTable = pointsTable.map((t) => {
+      if (t.id === teamId) return updatedTeam;
+      if (t.id === opponentId) return updatedOpponent;
+      return t;
+    });
+
+    return {
+      position: getTeamPosition(updatedTable, teamId),
+      nrr: updatedTeam.nrr,
+    };
+  };
+
+  // Find min
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const res = simulate(mid);
+
+    if (res.position <= desiredPosition) {
+      minRuns = mid;
+      high = mid - 1;
+    } else {
+      low = mid + 1;
     }
   }
 
-  if (minRuns === null || maxRuns === null) return null;
+  if (minRuns === null) return null;
+
+  // Find max
+  low = minRuns;
+  high = teamRuns;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const res = simulate(mid);
+
+    if (res.position <= desiredPosition) {
+      maxRuns = mid;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+
+  if (maxRuns === null) return null;
 
   return {
     minRuns,
     maxRuns,
-    minNRR: +nrrAt(maxRuns).toFixed(3),
-    maxNRR: +nrrAt(minRuns).toFixed(3),
+    minNRR: +simulate(maxRuns).nrr.toFixed(3),
+    maxNRR: +simulate(minRuns).nrr.toFixed(3),
   };
 }
-

@@ -41,13 +41,17 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         </h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
           <div>
-            <span className="text-gray-500">Min Runs:</span>{" "}
+            <span className="text-gray-500">
+              Min {`${tossResult === "batting" ? "Runs" : "Overs"}`}:
+            </span>{" "}
             <span className="font-semibold text-orange-600">
               {tossResult === "batting" ? minRuns : minOvers}
             </span>
           </div>
           <div>
-            <span className="text-gray-500">Max Runs:</span>{" "}
+            <span className="text-gray-500">
+              Max {`${tossResult === "batting" ? "Runs" : "Overs"}`}::
+            </span>{" "}
             <span className="font-semibold text-orange-600">
               {tossResult === "batting" ? maxRuns : maxOvers}
             </span>
