@@ -11,6 +11,11 @@ interface BattingFirstInput {
   desiredPosition: number;
 }
 
+/**
+ * Calculates the range of opponent runs for which
+ * the given team finishes at the desired position
+ * when batting first.
+ */
 export function calculateBattingFirstRange({
   teamId,
   opponentId,
@@ -24,11 +29,13 @@ export function calculateBattingFirstRange({
 
   const matchOversDec = oversToDecimal(matchOvers);
 
-  let low = 0;
-  let high = teamRuns;
-  let minRuns: number | null = null;
-  let maxRuns: number | null = null;
+  let minRuns: number | null = Infinity;
+  let maxRuns: number | null = -Infinity;
 
+  /**
+   * Simulates a single match scenario
+   * for given opponent runs and returns the resulting table position and NRR
+   */
   const simulate = (oppRuns: number) => {
     const teamWin = teamRuns > oppRuns;
 
@@ -38,6 +45,8 @@ export function calculateBattingFirstRange({
       oversFaced: oversToDecimal(team.oversFaced) + matchOversDec,
       runsAgainst: team.runsAgainst + oppRuns,
       oversBowled: oversToDecimal(team.oversBowled) + matchOversDec,
+      wins: team.wins + (teamWin ? 1 : 0),
+      losses: team.losses + (!teamWin ? 1 : 0),
       points: team.points + (teamWin ? 2 : 0),
     };
 
@@ -47,17 +56,21 @@ export function calculateBattingFirstRange({
       oversFaced: oversToDecimal(opponent.oversFaced) + matchOversDec,
       runsAgainst: opponent.runsAgainst + teamRuns,
       oversBowled: oversToDecimal(opponent.oversBowled) + matchOversDec,
+      wins: opponent.wins + (!teamWin ? 1 : 0),
+      losses: opponent.losses + (teamWin ? 1 : 0),
       points: opponent.points + (!teamWin ? 2 : 0),
     };
 
     updatedTeam.nrr = calculateNRR(updatedTeam);
     updatedOpponent.nrr = calculateNRR(updatedOpponent);
 
-    const updatedTable = pointsTable.map((t) => {
-      if (t.id === teamId) return updatedTeam;
-      if (t.id === opponentId) return updatedOpponent;
-      return t;
-    });
+    const updatedTable = pointsTable
+      .map((t) => {
+        if (t.id === teamId) return updatedTeam;
+        if (t.id === opponentId) return updatedOpponent;
+        return t;
+      })
+      .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
 
     return {
       position: getTeamPosition(updatedTable, teamId),
@@ -65,39 +78,20 @@ export function calculateBattingFirstRange({
     };
   };
 
-  // Find min
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const res = simulate(mid);
-
-    if (res.position <= desiredPosition) {
-      minRuns = mid;
-      high = mid - 1;
-    } else {
-      low = mid + 1;
+  for (let oppRuns = 0; oppRuns <= teamRuns; oppRuns++) {
+    const res = simulate(oppRuns);
+    if (res && res?.position === desiredPosition) {
+      if (oppRuns < minRuns!) minRuns = oppRuns;
+      if (oppRuns > maxRuns!) maxRuns = oppRuns;
     }
   }
 
-  if (minRuns === null) return null;
+  if (minRuns === Infinity || maxRuns === -Infinity) return null;
 
-  // Find max
-  low = minRuns;
-  high = teamRuns;
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const res = simulate(mid);
-
-    if (res.position <= desiredPosition) {
-      maxRuns = mid;
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  if (maxRuns === null) return null;
-
+  /**
+   * minNRR occurs at maximum opponent runs
+   * maxNRR occurs at minimum opponent runs
+   */
   return {
     minRuns,
     maxRuns,
