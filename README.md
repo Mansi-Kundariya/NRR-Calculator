@@ -126,9 +126,17 @@ Start frontend
 ```bash
 npm run dev
 ```
-<img width="1896" height="703" alt="image" src="https://github.com/user-attachments/assets/c0446b03-e400-47ec-b8c6-2faab64ee7b1" />
-<img width="1893" height="699" alt="image" src="https://github.com/user-attachments/assets/49d7bc51-8925-41a2-be67-66145ecde86b" />
-<img width="1871" height="534" alt="image" src="https://github.com/user-attachments/assets/5ca503d6-1ddd-47bc-8557-640099d91eaa" />
+#### Point Table : 
+<img width="940" height="341" alt="image" src="https://github.com/user-attachments/assets/6826d984-923d-4228-9b1e-d632ecdd0eb3" />
+
+#### Case 1 : Runs Scored (Batting First)
+<img width="940" height="350" alt="image" src="https://github.com/user-attachments/assets/da114719-f5e5-426a-b971-a3c8248c9531" />
+<img width="940" height="267" alt="image" src="https://github.com/user-attachments/assets/d1eef795-4a12-4c9f-91c2-69d2c6d41cd4" />
+
+#### Case 2 : Runs to Chase (Bowling First)
+<img width="940" height="355" alt="image" src="https://github.com/user-attachments/assets/2dc732a6-7089-4703-8849-7b5becfe8a7d" />
+<img width="940" height="266" alt="image" src="https://github.com/user-attachments/assets/2025bcfe-9c6b-4543-bf85-197c46b41bae" />
+
 
 
 ### 📊 Sample Output
