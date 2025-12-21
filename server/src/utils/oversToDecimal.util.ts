@@ -20,6 +20,6 @@ export function oversToDecimal(overs: number): number {
     throw new Error(`Invalid overs format: ${overs}`);
   }
 
-  const decimalOvers = (wholeOvers * 6 + balls) / 6;
+  const decimalOvers = wholeOvers + balls / 6;
   return Number(decimalOvers.toFixed(3));
 }
