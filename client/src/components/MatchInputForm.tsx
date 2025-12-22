@@ -12,7 +12,7 @@ export function MatchInputForm({ teams, onCalculate }: MatchInputFormProps) {
   const [yourTeam, setYourTeam] = useState<number>(0);
   const [oppositionTeam, setOppositionTeam] = useState<number>(0);
   const [matchOvers, setMatchOvers] = useState<string>("20");
-  const [desiredPosition, setDesiredPosition] = useState<string>("3");
+  const [desiredPosition, setDesiredPosition] = useState<string>("");
   const [tossResult, setTossResult] = useState<"batting" | "bowling">(
     "batting"
   );

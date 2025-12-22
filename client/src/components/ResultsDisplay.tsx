@@ -25,13 +25,28 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       {/* Scenario Summary Header */}
       <div className="flex flex-wrap gap-2">
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
+          {teamName
+            .split(" ")
+            .map((char) => `${char[0]}`)
+            .join("")}{" "}
+          vs{" "}
+          {opponentName
+            .split(" ")
+            .map((char) => `${char[0]}`)
+            .join("")}
+        </span>
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
           {tossResult === "batting" ? "Batting First" : "Bowling First"}
+        </span>
+        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
+          {runs} Runs
         </span>
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
           {matchOvers} Overs
         </span>
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
-          Target Position: #{desiredPosition}
+          Target Position: {desiredPosition}{" "}
+          <span className="ml-1 font-normal">(Only)</span>
         </span>
       </div>
 
@@ -59,13 +74,13 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
           <div>
             <span className="text-gray-500">Min NRR:</span>{" "}
             <span className="font-semibold text-blue-900">
-              +{minNRR.toFixed(3)}
+              +{minNRR?.toFixed(3)}
             </span>
           </div>
           <div>
             <span className="text-gray-500">Max NRR:</span>{" "}
             <span className="font-semibold text-blue-900">
-              +{maxNRR.toFixed(3)}
+              +{maxNRR?.toFixed(3)}
             </span>
           </div>
         </div>
@@ -120,11 +135,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   </span>{" "}
                   will be between{" "}
                   <span className="font-semibold text-blue-900">
-                    +{minNRR.toFixed(3)}
+                    +{minNRR?.toFixed(3)}
                   </span>{" "}
                   to{" "}
                   <span className="font-semibold text-blue-900">
-                    +{maxNRR.toFixed(3)}
+                    +{maxNRR?.toFixed(3)}
                   </span>
                   .
                 </p>
@@ -160,11 +175,11 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
                   </span>{" "}
                   will be between{" "}
                   <span className="font-semibold text-blue-900">
-                    +{minNRR.toFixed(3)}
+                    +{minNRR?.toFixed(3)}
                   </span>{" "}
                   to{" "}
                   <span className="font-semibold text-blue-900">
-                    +{maxNRR.toFixed(3)}
+                    +{maxNRR?.toFixed(3)}
                   </span>
                   .
                 </p>

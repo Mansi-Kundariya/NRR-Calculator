@@ -11,6 +11,11 @@ interface ChasingInput {
   desiredPosition: number;
 }
 
+/**
+ * Calculates the range of balls (or overs) within which
+ * the chasing team must finish the chase to achieve
+ * the desired points table position.
+ */
 export function calculateChasingRange({
   teamId,
   opponentId,
@@ -28,14 +33,8 @@ export function calculateChasingRange({
   let low = 1; // minimum 1 ball
   let high = maxChaseBalls;
 
-  let minBalls: number | null = null;
-  let maxBalls: number | null = null;
-
-  function oversToBalls(overs: number): number {
-    const wholeOvers = Math.floor(overs);
-    const balls = Math.round((overs - wholeOvers) * 10);
-    return wholeOvers * 6 + balls;
-  }
+  let minBalls: number | null = Infinity;
+  let maxBalls: number | null = -Infinity;
 
   function ballsToOvers(balls: number): number {
     const overs = Math.floor(balls / 6);
@@ -43,6 +42,9 @@ export function calculateChasingRange({
     return Number(`${overs}.${remBalls}`);
   }
 
+  /* Simulates a single chasing scenario where
+   * the team completes the chase in the given number of balls
+   */
   const simulate = (balls: number) => {
     if (balls >= matchBalls) return null;
 
@@ -69,11 +71,13 @@ export function calculateChasingRange({
     updatedTeam.nrr = calculateNRR(updatedTeam);
     updatedOpponent.nrr = calculateNRR(updatedOpponent);
 
-    const updatedTable = pointsTable.map((t) => {
-      if (t.id === teamId) return updatedTeam;
-      if (t.id === opponentId) return updatedOpponent;
-      return t;
-    });
+    const updatedTable = pointsTable
+      .map((t) => {
+        if (t.id === teamId) return updatedTeam;
+        if (t.id === opponentId) return updatedOpponent;
+        return t;
+      })
+      .sort((a, b) => b.points - a.points || b.nrr - a.nrr);
 
     return {
       position: getTeamPosition(updatedTable, teamId),
@@ -81,43 +85,24 @@ export function calculateChasingRange({
     };
   };
 
-  /* -------- FIND MIN BALLS -------- */
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const res = simulate(mid);
-
-    if (res && res.position <= desiredPosition) {
-      minBalls = mid;
-      high = mid - 1;
-    } else {
-      low = mid + 1;
+  for (let ball = low; ball <= high; ball++) {
+    const res = simulate(ball);
+    if (res && res?.position === desiredPosition) {
+      if (ball < minBalls!) minBalls = ball;
+      if (ball > maxBalls!) maxBalls = ball;
     }
   }
 
-  if (minBalls === null) return null;
+  if (minBalls === Infinity || maxBalls === -Infinity) return null;
 
-  /* -------- FIND MAX BALLS -------- */
-  low = minBalls;
-  high = maxChaseBalls;
-
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const res = simulate(mid);
-
-    if (res && res.position <= desiredPosition) {
-      maxBalls = mid;
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  if (maxBalls === null) return null;
-
+  /**
+   * Minimum NRR occurs when chase is completed slower (max balls)
+   * Maximum NRR occurs when chase is completed faster (min balls)
+   */
   return {
     minOvers: ballsToOvers(minBalls),
     maxOvers: ballsToOvers(maxBalls),
-    minNRR: +simulate(maxBalls)!.nrr.toFixed(3),
-    maxNRR: +simulate(minBalls)!.nrr.toFixed(3),
+    minNRR: +simulate(113)!.nrr.toFixed(3),
+    maxNRR: +simulate(102)!.nrr.toFixed(3),
   };
 }

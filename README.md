@@ -78,8 +78,6 @@ NRR-Calculator/
 │
 └── README.md
 ```
-
-
 ---
 
 ## ⚙️ Backend Setup & Run
@@ -126,18 +124,17 @@ Start frontend
 ```bash
 npm run dev
 ```
+
 #### Point Table : 
 <img width="940" height="341" alt="image" src="https://github.com/user-attachments/assets/6826d984-923d-4228-9b1e-d632ecdd0eb3" />
 
 #### Case 1 : Runs Scored (Batting First)
-<img width="940" height="350" alt="image" src="https://github.com/user-attachments/assets/da114719-f5e5-426a-b971-a3c8248c9531" />
-<img width="940" height="267" alt="image" src="https://github.com/user-attachments/assets/d1eef795-4a12-4c9f-91c2-69d2c6d41cd4" />
+<img width="940" height="348" alt="image" src="https://github.com/user-attachments/assets/d39129d0-97ae-4768-b6f6-02a7fb0d1b1e" />
+<img width="940" height="271" alt="image" src="https://github.com/user-attachments/assets/946b6c24-40c5-432d-a810-d1a7dec2e6cf" />
 
 #### Case 2 : Runs to Chase (Bowling First)
-<img width="940" height="355" alt="image" src="https://github.com/user-attachments/assets/2dc732a6-7089-4703-8849-7b5becfe8a7d" />
-<img width="940" height="266" alt="image" src="https://github.com/user-attachments/assets/2025bcfe-9c6b-4543-bf85-197c46b41bae" />
-
-
+<img width="940" height="352" alt="image" src="https://github.com/user-attachments/assets/e4aebcea-b95c-4a47-b209-bce866b683d2" />
+<img width="940" height="269" alt="image" src="https://github.com/user-attachments/assets/6df7501b-2a53-483a-912b-9d324a4b693d" />
 
 ### 📊 Sample Output
 ## Bowling First Case
@@ -163,4 +160,3 @@ This project demonstrates:
 ## 👩‍💻 Developed By
 **Mansi Patel**
 Full Stack Developer
-
