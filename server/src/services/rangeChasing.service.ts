@@ -102,7 +102,7 @@ export function calculateChasingRange({
   return {
     minOvers: ballsToOvers(minBalls),
     maxOvers: ballsToOvers(maxBalls),
-    minNRR: +simulate(113)!.nrr.toFixed(3),
-    maxNRR: +simulate(102)!.nrr.toFixed(3),
+    minNRR: +simulate(maxBalls)!.nrr.toFixed(3),
+    maxNRR: +simulate(minBalls)!.nrr.toFixed(3),
   };
 }
