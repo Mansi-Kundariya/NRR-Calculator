@@ -124,30 +124,17 @@ Start frontend
 ```bash
 npm run dev
 ```
-
 #### Point Table : 
-<img width="940" height="341" alt="image" src="https://github.com/user-attachments/assets/6826d984-923d-4228-9b1e-d632ecdd0eb3" />
+<img width="1900" height="695" alt="image" src="https://github.com/user-attachments/assets/549da64d-bde7-4f83-9cc6-30a449169014" />
 
 #### Case 1 : Runs Scored (Batting First)
-<img width="940" height="348" alt="image" src="https://github.com/user-attachments/assets/d39129d0-97ae-4768-b6f6-02a7fb0d1b1e" />
-<img width="940" height="271" alt="image" src="https://github.com/user-attachments/assets/946b6c24-40c5-432d-a810-d1a7dec2e6cf" />
+<img width="1899" height="700" alt="image" src="https://github.com/user-attachments/assets/dda7581c-8c89-4aa9-acd0-8c2d902b8ba8" />
+<img width="1894" height="546" alt="image" src="https://github.com/user-attachments/assets/dcc0b55c-0e8a-4c52-be57-edf23a74be20" />
 
 #### Case 2 : Runs to Chase (Bowling First)
-<img width="940" height="352" alt="image" src="https://github.com/user-attachments/assets/e4aebcea-b95c-4a47-b209-bce866b683d2" />
-<img width="940" height="269" alt="image" src="https://github.com/user-attachments/assets/6df7501b-2a53-483a-912b-9d324a4b693d" />
+<img width="1891" height="698" alt="image" src="https://github.com/user-attachments/assets/d74aa3ce-0d61-4f6d-b55d-0b704a292e31" />
+<img width="1893" height="549" alt="image" src="https://github.com/user-attachments/assets/a77467ce-8e22-430a-acc3-4bf98e5f74c7" />
 
-### 📊 Sample Output
-## Bowling First Case
-```pgsql
-If Rajasthan Royals score 120 runs in 20 overs,
-they need to restrict Delhi Capitals between 69 to 112 runs.
-Revised NRR will be between 0.322 to 0.596.
-```
-## Batting Second Case
-```pgsql
-Rajasthan Royals need to chase 119 runs between 14.2 to 19.1 overs.
-Revised NRR will be between 0.320 to 0.596.
-```
 ---
 
 ### 🏁 Conclusion

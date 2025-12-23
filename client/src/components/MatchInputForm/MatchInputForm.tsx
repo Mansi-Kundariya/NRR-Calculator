@@ -1,42 +1,28 @@
-import type React from "react";
-import { useState } from "react";
-import type { Team, MatchScenario } from "../types";
-import { toast } from "react-toastify";
+import MatchInputFormController from "./MatchInputFormController";
+import type { Team, MatchScenario } from "../../types";
 
 interface MatchInputFormProps {
   teams: Team[];
   onCalculate: (scenario: MatchScenario) => void;
 }
 
-export function MatchInputForm({ teams, onCalculate }: MatchInputFormProps) {
-  const [yourTeam, setYourTeam] = useState<number>(0);
-  const [oppositionTeam, setOppositionTeam] = useState<number>(0);
-  const [matchOvers, setMatchOvers] = useState<string>("20");
-  const [desiredPosition, setDesiredPosition] = useState<string>("");
-  const [tossResult, setTossResult] = useState<"batting" | "bowling">(
-    "batting"
-  );
-  const [runs, setRuns] = useState<string>("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!yourTeam || !oppositionTeam || !runs) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    const scenario: MatchScenario = {
-      yourTeam,
-      oppositionTeam,
-      matchOvers: Number.parseFloat(matchOvers),
-      desiredPosition: Number.parseInt(desiredPosition),
-      tossResult,
-      runs: Number.parseInt(runs),
-    };
-
-    onCalculate(scenario);
-  };
+const MatchInputForm = (props: MatchInputFormProps) => {
+  const { teams, onCalculate } = props;
+  const {
+    handleSubmit,
+    yourTeam,
+    setYourTeam,
+    oppositionTeam,
+    setOppositionTeam,
+    matchOvers,
+    setMatchOvers,
+    desiredPosition,
+    setDesiredPosition,
+    tossResult,
+    setTossResult,
+    runs,
+    setRuns,
+  } = MatchInputFormController({ onCalculate });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -198,4 +184,6 @@ export function MatchInputForm({ teams, onCalculate }: MatchInputFormProps) {
       </button>
     </form>
   );
-}
+};
+
+export default MatchInputForm;

@@ -28,10 +28,6 @@ export function calculateChasingRange({
   if (!team || !opponent) return null;
 
   const matchBalls = matchOvers * 6;
-  const maxChaseBalls = matchBalls - 1; // must win before last ball
-
-  let low = 1; // minimum 1 ball
-  let high = maxChaseBalls;
 
   let minBalls: number | null = Infinity;
   let maxBalls: number | null = -Infinity;
@@ -46,13 +42,13 @@ export function calculateChasingRange({
    * the team completes the chase in the given number of balls
    */
   const simulate = (balls: number) => {
-    if (balls >= matchBalls) return null;
+    if (balls > matchBalls) return null;
 
     const overs = balls / 6;
 
     const updatedTeam = {
       ...team,
-      runsFor: team.runsFor + targetRuns,
+      runsFor: team.runsFor + targetRuns + 1,
       oversFaced: oversToDecimal(team.oversFaced) + overs,
       runsAgainst: team.runsAgainst + targetRuns,
       oversBowled: oversToDecimal(team.oversBowled) + matchOvers,
@@ -63,7 +59,7 @@ export function calculateChasingRange({
       ...opponent,
       runsFor: opponent.runsFor + targetRuns,
       oversFaced: oversToDecimal(opponent.oversFaced) + matchOvers,
-      runsAgainst: opponent.runsAgainst + targetRuns,
+      runsAgainst: opponent.runsAgainst + targetRuns + 1,
       oversBowled: oversToDecimal(opponent.oversBowled) + overs,
       points: opponent.points,
     };
@@ -85,7 +81,7 @@ export function calculateChasingRange({
     };
   };
 
-  for (let ball = low; ball <= high; ball++) {
+  for (let ball = 1; ball <= matchBalls; ball++) {
     const res = simulate(ball);
     if (res && res?.position === desiredPosition) {
       if (ball < minBalls!) minBalls = ball;
