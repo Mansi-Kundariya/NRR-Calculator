@@ -1,10 +1,12 @@
-import type { Team } from "../types";
+import type { Team } from "../../types";
 
 interface PointsTableProps {
   teams: Team[];
 }
 
-export function PointsTable({ teams }: PointsTableProps) {
+const PointsTable = (props: PointsTableProps) => {
+  const { teams } = props;
+
   const sortedTeams = [...teams].sort((a, b) => {
     if (b.points !== a.points) return b.points - a.points;
     return b.nrr - a.nrr;
@@ -66,4 +68,6 @@ export function PointsTable({ teams }: PointsTableProps) {
       </table>
     </div>
   );
-}
+};
+
+export default PointsTable;

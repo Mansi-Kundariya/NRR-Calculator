@@ -1,10 +1,10 @@
-import type { CalculationResult } from "../types";
+import type { CalculationResult } from "../../types";
 
 interface ResultsDisplayProps {
   result: CalculationResult;
 }
 
-export function ResultsDisplay({ result }: ResultsDisplayProps) {
+const ResultsDisplay = ({ result }: ResultsDisplayProps) => {
   const {
     minRuns,
     maxRuns,
@@ -46,7 +46,6 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
         </span>
         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border border-gray-300 bg-white">
           Target Position: {desiredPosition}{" "}
-          <span className="ml-1 font-normal">(Only)</span>
         </span>
       </div>
 
@@ -190,4 +189,6 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       </div>
     </div>
   );
-}
+};
+
+export default ResultsDisplay;
